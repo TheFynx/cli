@@ -1,0 +1,38 @@
+# Final Fantasy VII — Midgar Mako
+mode = "dark"
+
+accent = "#63e6be"
+selection = "#264b4c"
+muted = "#71858e"
+
+background = "#0b1116"
+dark_background = "#080d11"
+darker_background = "#05080b"
+lighter_background = "#19272e"
+
+foreground = "#d9e5e7"
+dark_foreground = "#82979e"
+light_foreground = "#b6cbd0"
+bright_foreground = "#f0faf7"
+
+red = "#ef8291"
+yellow = "#e5cf8f"
+orange = "#e9ac80"
+green = "#63e6be"
+cyan = "#79d8de"
+blue = "#82b5ed"
+magenta = "#bc9be7"
+brown = "#ae8f79"
+
+bright_red = "#ffa3ad"
+bright_yellow = "#f7e4ac"
+bright_green = "#9bf7d5"
+bright_cyan = "#a1eff0"
+bright_blue = "#abd0ff"
+bright_magenta = "#d7baff"
+
+# Mako energy and linked materia window outlines.
+hyprland_active_border = "rgba(63e6beee) rgba(79d8deee) rgba(bc9be7cc) 45deg"
+hyprland_inactive_border = "rgba(30464dcc)"
+selection_foreground = "#f0faf7"
+selection_background = "#264b4c"

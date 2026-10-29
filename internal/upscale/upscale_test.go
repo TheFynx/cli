@@ -1,4 +1,4 @@
-package main
+package upscale
 
 import (
 	"image"
@@ -18,8 +18,8 @@ func TestUpscaleOriginalsAndVerifiedCache(t *testing.T) {
 	input := filepath.Join(root, "in")
 	output := filepath.Join(root, "out")
 	models := filepath.Join(root, "models")
-	os.MkdirAll(input, 0755)
-	os.MkdirAll(models, 0755)
+	os.MkdirAll(input, 0o755)
+	os.MkdirAll(models, 0o755)
 	source := filepath.Join(input, "scene.png")
 	f, _ := os.Create(source)
 	im := image.NewRGBA(image.Rect(0, 0, 8, 5))
@@ -28,14 +28,14 @@ func TestUpscaleOriginalsAndVerifiedCache(t *testing.T) {
 	f.Close()
 	before, _ := hash(source)
 	for _, name := range []string{"realesrgan-x4plus.bin", "realesrgan-x4plus.param"} {
-		os.WriteFile(filepath.Join(models, name), []byte("fixture"), 0644)
+		os.WriteFile(filepath.Join(models, name), []byte("fixture"), 0o644)
 	}
 	engine := filepath.Join(root, "engine")
 	calls := filepath.Join(root, "calls")
 	script := "#!/bin/sh\nwhile [ $# -gt 0 ]; do case $1 in -i) shift; input=$1;; -o) shift; output=$1;; esac; shift; done\nprintf x >> '" + calls + "'\ncp \"$input\" \"$output\"\n"
-	os.WriteFile(engine, []byte(script), 0755)
-	args := []string{"--input", input, "--output", output, "--engine", engine, "--models", models, "--width", "32"}
-	if e := upscale(args); e != nil {
+	os.WriteFile(engine, []byte(script), 0o755)
+	p := Params{Input: input, Output: output, Engine: engine, Models: models, Width: 32, Model: "realesrgan-x4plus"}
+	if e := Run(p); e != nil {
 		t.Fatal(e)
 	}
 	w, h, e := dimensions(filepath.Join(output, "scene.png"))
@@ -46,26 +46,28 @@ func TestUpscaleOriginalsAndVerifiedCache(t *testing.T) {
 	if before != after {
 		t.Fatal("original changed")
 	}
-	if e := upscale(args); e != nil {
+	// A valid cache must not re-run inference.
+	if e := Run(p); e != nil {
 		t.Fatal(e)
 	}
-	b, _ := os.ReadFile(calls)
-	if len(b) != 1 {
+	if b, _ := os.ReadFile(calls); len(b) != 1 {
 		t.Fatal("valid cache repeated inference")
 	}
-	os.WriteFile(filepath.Join(output, "scene.png"), []byte("tampered"), 0644)
-	if e := upscale(args); e != nil {
+	// A tampered export must be regenerated.
+	os.WriteFile(filepath.Join(output, "scene.png"), []byte("tampered"), 0o644)
+	if e := Run(p); e != nil {
 		t.Fatal(e)
 	}
-	b, _ = os.ReadFile(calls)
-	if len(b) != 2 {
+	if b, _ := os.ReadFile(calls); len(b) != 2 {
 		t.Fatal("tampered export was trusted")
 	}
-	if e := upscale([]string{"--input", input, "--output", input}); e == nil {
+	// Refuse same source and output.
+	if e := Run(Params{Input: input, Output: input, Engine: engine, Models: models, Width: 32}); e == nil {
 		t.Fatal("same source/output accepted")
 	}
+	// Dry run writes nothing.
 	plan := filepath.Join(root, "plan")
-	if e := upscale([]string{"--input", input, "--output", plan, "--dry-run"}); e != nil {
+	if e := Run(Params{Input: input, Output: plan, Plan: true, Engine: engine, Models: models, Width: 32}); e != nil {
 		t.Fatal(e)
 	}
 	if _, e := os.Stat(plan); !os.IsNotExist(e) {
