@@ -1,11 +1,12 @@
 # Fynx CLI
 
 Personal Go CLI that replaced `~/.functions` with maintained subcommands.
-Source lives at https://github.com/thefynx/cli (clone to `~/git/thefynx/cli`,
-which is where provisioning expects it); the executable is `fynx`. Theme
-builders, disk reports, DNS lookups, reachability probes, and repo tools
-run natively in Go: no Python, no Pillow, no dig dependency. Engine
-upscaling still shells to the official Real-ESRGAN binary.
+Source lives at https://github.com/TheFynx/cli. Clone it to
+`~/git/thefynx/cli`, which is where provisioning expects it. The
+executable is `fynx`. Theme builders, disk reports, DNS lookups,
+reachability probes, and repo tools run natively in Go. They need no
+Python, no Pillow, and no dig. Engine upscaling still shells to the
+official Real-ESRGAN binary.
 
 ```bash
 go test ./...
@@ -15,37 +16,38 @@ fynx --help
 
 `build.sh` compiles into `~/.local/bin/fynx` and installs the persistent
 native asset installer under `${XDG_DATA_HOME:-~/.local/share}/fynx`.
-Ensure `~/.local/bin` is on PATH. The old shell wrappers are not removed by
-the build; retire them yourself: `fynx aliases bash` (or `zsh`, `fish`)
-prints the alias block to paste into your shell rc, then delete
+Keep `~/.local/bin` on PATH. The build does not remove old shell
+wrappers. Retire them yourself: run `fynx aliases bash` (or `zsh`,
+`fish`), paste the printed block into your shell rc, then delete
 `~/.functions`.
 
 ## Commands
 
 | Command | Replaces | Notes |
 |---|---|---|
-| `fynx assets setup` | — | checksum-pinned Real-ESRGAN + x4plus install |
-| `fynx assets upscale` | — | receipt-verified 4x upscaling and export |
+| `fynx assets setup` | new | checksum-pinned Real-ESRGAN + x4plus install |
+| `fynx assets upscale` | new | receipt-verified 4x upscaling and export |
 | `fynx theme build minecraft\|midgar` | two Python builders | native SVG/GTK/Qt generation |
 | `fynx docker clean [all\|fire]` | `dclean` | `--dry-run` prints planned commands |
 | `fynx disk usage [PATH]...` | `fs` | `du -sbh`-style apparent sizes, no subprocess |
 | `fynx dns lookup NAME` | `digga` | built-in resolver, grouped records, no dig |
-| `fynx net isup URI` | `isup` | real HTTP probe; exits 1 when down |
+| `fynx net isup URI` | `isup` | real HTTP probe, exits 1 when down |
 | `fynx man [SECTION] PAGE...` | colored `man` | alias `man='fynx man'` |
-| `fynx repo check BASE` | `git-check` | per-repo report plus summary; no symlink loops |
+| `fynx repo check BASE` | `git-check` | per-repo report plus summary, no symlink loops |
 | `fynx repo contents DIR` | `copy_repo_contents` | inlines cmd/ and internal/ file contents |
-| `fynx aliases [shell]` | — | prints the alias block above |
+| `fynx aliases [shell]` | new | prints the alias block above |
 
-Two old shell bugs are corrected by design: `isup` used to report the
-opposite verdict for HTTP 200, and `copy_repo_contents`'s `tar` step
-silently re-extracted `cmd/`/`internal/` under `/` instead of appending
-their contents.
+Two shell bugs are corrected by design. `isup` used to report the
+opposite verdict for HTTP 200. The `copy_repo_contents` tar step
+silently re-extracted `cmd/` and `internal/` under `/` instead of
+appending their contents.
 
 ## Configuration
 
-`$FYNX_CONFIG`, then `$XDG_CONFIG_HOME/fynx/config.toml`, then
-`~/.config/fynx/config.toml`. A missing file means built-in defaults.
-Flags override config; config overrides defaults. Values accept `~`.
+Configuration file discovery order: `$FYNX_CONFIG`, then
+`$XDG_CONFIG_HOME/fynx/config.toml`, then `~/.config/fynx/config.toml`.
+A missing file means built-in defaults. Flags override config, and
+config overrides defaults. Values accept `~`.
 
 ```toml
 [upscale]
@@ -66,22 +68,22 @@ fynx assets upscale --dry-run
 fynx assets upscale
 ```
 
-Setup installs checksum-pinned official Linux x86_64 Real-ESRGAN
-NCNN/Vulkan release binaries and the official x4plus model. Requires curl,
-unzip, a working Vulkan driver/loader, and ImageMagick v7 (`magick`). The
-recorded hashes pin downloaded bytes; they are not publisher signatures. A
-custom engine/model directory can be selected with `--engine` and
-`--models`, or in config.
+Setup installs the checksum-pinned official Real-ESRGAN NCNN/Vulkan
+release binaries for Linux x86_64 and the official x4plus model. It
+requires curl, unzip, a working Vulkan driver/loader, and ImageMagick
+v7 (`magick`). The recorded hashes pin downloaded bytes. They are not
+publisher signatures. Select a custom engine or model directory with
+`--engine` and `--models`, or in config.
 
-Upscaling uses x4plus at 4x followed by Lanczos to 3840 pixels wide by
-default. The original aspect ratio is preserved with nearest-integer export
-height; `--width` changes the target. Files export separately, originals
-remain unchanged, and intermediates are removed after success. One SHA-256
-receipt per export records source, engine/model bytes, dimensions, and
-output. A matching receipt skips repeated inference; changed
-originals/models or tampered exports regenerate. `--force` bypasses the
-cache. Outputs with different source extensions get distinct names. Work
-runs serially with bounded GPU tiles.
+Upscaling runs x4plus at 4x, then a Lanczos resize to 3840 pixels wide
+by default. The original aspect ratio is preserved with nearest-integer
+export height. `--width` changes the target. Files export separately.
+Originals remain unchanged. Intermediates are removed after success.
+One SHA-256 receipt per export records the source, engine/model bytes,
+dimensions, and output. A matching receipt skips repeated inference.
+Changed originals, changed models, or tampered exports regenerate.
+`--force` bypasses the cache. Outputs with different source extensions
+get distinct names. Work runs serially with bounded GPU tiles.
 
 ## Native theme builders
 
@@ -90,15 +92,16 @@ fynx theme build midgar
 fynx theme build minecraft
 ```
 
-Generates native SVG icons, palette-driven GTK/Qt assets, and screensaver
-text from the installed themes' `colors.toml`, byte-compatible with the
-retired Python builders (verified by tree diff). Commands overwrite
-generated assets in the installed theme; review handcrafted edits before
-running, and reapply with `omarchy theme set <slug>` afterward. Runtime
-theme hooks remain in the blueprints' common theme layer. No wallpapers,
-no image provider, no network.
+Generates native SVG icons, palette-driven GTK/Qt assets, and
+screensaver text from the installed themes' `colors.toml`. The output is
+byte-compatible with the retired Python builders, verified by tree
+diff. The commands overwrite generated assets in the installed theme.
+Review handcrafted edits before you run them, and reapply with
+`omarchy theme set <slug>` afterward. Runtime theme hooks remain in the
+blueprints' common theme layer. No wallpapers, no image provider, no
+network.
 
-Omarchy's packaged CLI scans its own binary directory; its shell plugins
-provide UI/menu/lock integration. `fynx` remains an independent general
-CLI and does not modify `/usr/share/omarchy`. Cursor appearance is left to
-normal desktop settings.
+Omarchy's packaged CLI scans its own binary directory. Its shell plugins
+provide UI, menu, and lock integration. `fynx` remains an independent
+general CLI and does not modify `/usr/share/omarchy`. Cursor appearance
+is left to normal desktop settings.
