@@ -16,7 +16,7 @@ import (
 	"strconv"
 	"strings"
 
-	"fynx.local/cli/internal/config"
+	"github.com/TheFynx/cli/internal/config"
 )
 
 // Receipt records exactly what produced an export, so a matching receipt

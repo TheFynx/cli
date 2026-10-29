@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"fynx.local/cli/internal/dns"
+	"github.com/TheFynx/cli/internal/dns"
 )
 
 func newDNSCmd() *cobra.Command {

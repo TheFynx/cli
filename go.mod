@@ -1,4 +1,4 @@
-module fynx.local/cli
+module github.com/TheFynx/cli
 
 go 1.23
 

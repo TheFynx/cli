@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"fynx.local/cli/internal/config"
+	"github.com/TheFynx/cli/internal/config"
 )
 
 const version = "0.2.0"

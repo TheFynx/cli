@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"fynx.local/cli/internal/config"
-	"fynx.local/cli/internal/upscale"
+	"github.com/TheFynx/cli/internal/config"
+	"github.com/TheFynx/cli/internal/upscale"
 )
 
 func newAssetsCmd() *cobra.Command {

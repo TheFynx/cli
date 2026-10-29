@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"fynx.local/cli/internal/theme"
+	"github.com/TheFynx/cli/internal/theme"
 )
 
 func newThemeCmd() *cobra.Command {

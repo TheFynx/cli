@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"fynx.local/cli/internal/netcheck"
+	"github.com/TheFynx/cli/internal/netcheck"
 )
 
 func newNetCmd() *cobra.Command {
