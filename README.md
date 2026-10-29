@@ -1,7 +1,8 @@
 # Fynx CLI
 
 Personal Go CLI that replaced `~/.functions` with maintained subcommands.
-The checkout is `~/git/thefynx/cli`; the executable is `fynx`. Theme
+Source lives at https://github.com/thefynx/cli (clone to `~/git/thefynx/cli`,
+which is where provisioning expects it); the executable is `fynx`. Theme
 builders, disk reports, DNS lookups, reachability probes, and repo tools
 run natively in Go: no Python, no Pillow, no dig dependency. Engine
 upscaling still shells to the official Real-ESRGAN binary.
